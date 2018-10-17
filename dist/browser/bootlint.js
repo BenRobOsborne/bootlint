@@ -5,9 +5,10 @@
  * Licensed under the MIT License (https://github.com/twbs/bootlint/blob/master/LICENSE).
  */
 
-(function(){function r(e,n,t){function o(i,f){if(!n[i]){if(!e[i]){var c="function"==typeof require&&require;if(!f&&c)return c(i,!0);if(u)return u(i,!0);var a=new Error("Cannot find module '"+i+"'");throw a.code="MODULE_NOT_FOUND",a}var p=n[i]={exports:{}};e[i][0].call(p.exports,function(r){var n=e[i][1][r];return o(n||r)},p,p.exports,r,e,n,t)}return n[i].exports}for(var u="function"==typeof require&&require,i=0;i<t.length;i++)o(t[i]);return o}return r})()({1:[function(require,module,exports){
+(function(){
+var _$empty_1 = {};
 
-},{}],2:[function(require,module,exports){
+var _$jquery_2 = { exports: {} };
 /*!
  * jQuery JavaScript Library v3.3.1
  * https://jquery.com/
@@ -25,7 +26,7 @@
 
 	"use strict";
 
-	if ( typeof module === "object" && typeof module.exports === "object" ) {
+	if ( "object" === "object" && typeof _$jquery_2.exports === "object" ) {
 
 		// For CommonJS and CommonJS-like environments where a proper `window`
 		// is present, execute the factory and get jQuery.
@@ -34,7 +35,7 @@
 		// This accentuates the need for the creation of a real `window`.
 		// e.g. var jQuery = require("jquery")(window);
 		// See ticket #14549 for more info.
-		module.exports = global.document ?
+		_$jquery_2.exports = global.document ?
 			factory( global, true ) :
 			function( w ) {
 				if ( !w.document ) {
@@ -10373,9 +10374,10 @@ if ( !noGlobal ) {
 return jQuery;
 } );
 
-},{}],3:[function(require,module,exports){
+_$jquery_2 = _$jquery_2.exports
+var _$browser_3 = {};
 // shim for using process in browser
-var process = module.exports = {};
+var process = _$browser_3 = {};
 
 // cached from whatever global is present so that test runners that stub it
 // don't break things.  But we need to wrap it in a try catch in case it is
@@ -10559,9 +10561,9 @@ process.chdir = function (dir) {
 };
 process.umask = function() { return 0; };
 
-},{}],4:[function(require,module,exports){
+var _$semver_4 = {};
 (function (process){
-exports = module.exports = SemVer;
+_$semver_4 = _$semver_4 = SemVer;
 
 // The debug function is excluded entirely from the minified version.
 /* nomin */ var debug;
@@ -10579,7 +10581,7 @@ exports = module.exports = SemVer;
 
 // Note: this is the semver.org version of the spec that it implements
 // Not necessarily the package version of this code.
-exports.SEMVER_SPEC_VERSION = '2.0.0';
+_$semver_4.SEMVER_SPEC_VERSION = '2.0.0';
 
 var MAX_LENGTH = 256;
 var MAX_SAFE_INTEGER = Number.MAX_SAFE_INTEGER || 9007199254740991;
@@ -10588,8 +10590,8 @@ var MAX_SAFE_INTEGER = Number.MAX_SAFE_INTEGER || 9007199254740991;
 var MAX_SAFE_COMPONENT_LENGTH = 16;
 
 // The actual regexps go on exports.re
-var re = exports.re = [];
-var src = exports.src = [];
+var re = _$semver_4.re = [];
+var src = _$semver_4.src = [];
 var R = 0;
 
 // The following Regular Expressions can be used for tokenizing,
@@ -10807,8 +10809,11 @@ for (var i = 0; i < R; i++) {
     re[i] = new RegExp(src[i]);
 }
 
-exports.parse = parse;
-function parse(version, loose) {
+_$semver_4.parse = parse;
+function parse(version, options) {
+  if (!options || typeof options !== 'object')
+    options = { loose: !!options, includePrerelease: false }
+
   if (version instanceof SemVer)
     return version;
 
@@ -10818,35 +10823,37 @@ function parse(version, loose) {
   if (version.length > MAX_LENGTH)
     return null;
 
-  var r = loose ? re[LOOSE] : re[FULL];
+  var r = options.loose ? re[LOOSE] : re[FULL];
   if (!r.test(version))
     return null;
 
   try {
-    return new SemVer(version, loose);
+    return new SemVer(version, options);
   } catch (er) {
     return null;
   }
 }
 
-exports.valid = valid;
-function valid(version, loose) {
-  var v = parse(version, loose);
+_$semver_4.valid = valid;
+function valid(version, options) {
+  var v = parse(version, options);
   return v ? v.version : null;
 }
 
 
-exports.clean = clean;
-function clean(version, loose) {
-  var s = parse(version.trim().replace(/^[=v]+/, ''), loose);
+_$semver_4.clean = clean;
+function clean(version, options) {
+  var s = parse(version.trim().replace(/^[=v]+/, ''), options);
   return s ? s.version : null;
 }
 
-exports.SemVer = SemVer;
+_$semver_4.SemVer = SemVer;
 
-function SemVer(version, loose) {
+function SemVer(version, options) {
+  if (!options || typeof options !== 'object')
+    options = { loose: !!options, includePrerelease: false }
   if (version instanceof SemVer) {
-    if (version.loose === loose)
+    if (version.loose === options.loose)
       return version;
     else
       version = version.version;
@@ -10858,11 +10865,13 @@ function SemVer(version, loose) {
     throw new TypeError('version is longer than ' + MAX_LENGTH + ' characters')
 
   if (!(this instanceof SemVer))
-    return new SemVer(version, loose);
+    return new SemVer(version, options);
 
-  debug('SemVer', version, loose);
-  this.loose = loose;
-  var m = version.trim().match(loose ? re[LOOSE] : re[FULL]);
+  debug('SemVer', version, options);
+  this.options = options;
+  this.loose = !!options.loose;
+
+  var m = version.trim().match(options.loose ? re[LOOSE] : re[FULL]);
 
   if (!m)
     throw new TypeError('Invalid Version: ' + version);
@@ -10912,16 +10921,16 @@ SemVer.prototype.toString = function() {
 };
 
 SemVer.prototype.compare = function(other) {
-  debug('SemVer.compare', this.version, this.loose, other);
+  debug('SemVer.compare', this.version, this.options, other);
   if (!(other instanceof SemVer))
-    other = new SemVer(other, this.loose);
+    other = new SemVer(other, this.options);
 
   return this.compareMain(other) || this.comparePre(other);
 };
 
 SemVer.prototype.compareMain = function(other) {
   if (!(other instanceof SemVer))
-    other = new SemVer(other, this.loose);
+    other = new SemVer(other, this.options);
 
   return compareIdentifiers(this.major, other.major) ||
          compareIdentifiers(this.minor, other.minor) ||
@@ -10930,7 +10939,7 @@ SemVer.prototype.compareMain = function(other) {
 
 SemVer.prototype.comparePre = function(other) {
   if (!(other instanceof SemVer))
-    other = new SemVer(other, this.loose);
+    other = new SemVer(other, this.options);
 
   // NOT having a prerelease is > having one
   if (this.prerelease.length && !other.prerelease.length)
@@ -11056,7 +11065,7 @@ SemVer.prototype.inc = function(release, identifier) {
   return this;
 };
 
-exports.inc = inc;
+_$semver_4.inc = inc;
 function inc(version, release, loose, identifier) {
   if (typeof(loose) === 'string') {
     identifier = loose;
@@ -11070,7 +11079,7 @@ function inc(version, release, loose, identifier) {
   }
 }
 
-exports.diff = diff;
+_$semver_4.diff = diff;
 function diff(version1, version2) {
   if (eq(version1, version2)) {
     return null;
@@ -11097,7 +11106,7 @@ function diff(version1, version2) {
   }
 }
 
-exports.compareIdentifiers = compareIdentifiers;
+_$semver_4.compareIdentifiers = compareIdentifiers;
 
 var numeric = /^[0-9]+$/;
 function compareIdentifiers(a, b) {
@@ -11116,86 +11125,86 @@ function compareIdentifiers(a, b) {
          0;
 }
 
-exports.rcompareIdentifiers = rcompareIdentifiers;
+_$semver_4.rcompareIdentifiers = rcompareIdentifiers;
 function rcompareIdentifiers(a, b) {
   return compareIdentifiers(b, a);
 }
 
-exports.major = major;
+_$semver_4.major = major;
 function major(a, loose) {
   return new SemVer(a, loose).major;
 }
 
-exports.minor = minor;
+_$semver_4.minor = minor;
 function minor(a, loose) {
   return new SemVer(a, loose).minor;
 }
 
-exports.patch = patch;
+_$semver_4.patch = patch;
 function patch(a, loose) {
   return new SemVer(a, loose).patch;
 }
 
-exports.compare = compare;
+_$semver_4.compare = compare;
 function compare(a, b, loose) {
   return new SemVer(a, loose).compare(new SemVer(b, loose));
 }
 
-exports.compareLoose = compareLoose;
+_$semver_4.compareLoose = compareLoose;
 function compareLoose(a, b) {
   return compare(a, b, true);
 }
 
-exports.rcompare = rcompare;
+_$semver_4.rcompare = rcompare;
 function rcompare(a, b, loose) {
   return compare(b, a, loose);
 }
 
-exports.sort = sort;
+_$semver_4.sort = sort;
 function sort(list, loose) {
   return list.sort(function(a, b) {
-    return exports.compare(a, b, loose);
+    return _$semver_4.compare(a, b, loose);
   });
 }
 
-exports.rsort = rsort;
+_$semver_4.rsort = rsort;
 function rsort(list, loose) {
   return list.sort(function(a, b) {
-    return exports.rcompare(a, b, loose);
+    return _$semver_4.rcompare(a, b, loose);
   });
 }
 
-exports.gt = gt;
+_$semver_4.gt = gt;
 function gt(a, b, loose) {
   return compare(a, b, loose) > 0;
 }
 
-exports.lt = lt;
+_$semver_4.lt = lt;
 function lt(a, b, loose) {
   return compare(a, b, loose) < 0;
 }
 
-exports.eq = eq;
+_$semver_4.eq = eq;
 function eq(a, b, loose) {
   return compare(a, b, loose) === 0;
 }
 
-exports.neq = neq;
+_$semver_4.neq = neq;
 function neq(a, b, loose) {
   return compare(a, b, loose) !== 0;
 }
 
-exports.gte = gte;
+_$semver_4.gte = gte;
 function gte(a, b, loose) {
   return compare(a, b, loose) >= 0;
 }
 
-exports.lte = lte;
+_$semver_4.lte = lte;
 function lte(a, b, loose) {
   return compare(a, b, loose) <= 0;
 }
 
-exports.cmp = cmp;
+_$semver_4.cmp = cmp;
 function cmp(a, op, b, loose) {
   var ret;
   switch (op) {
@@ -11220,20 +11229,24 @@ function cmp(a, op, b, loose) {
   return ret;
 }
 
-exports.Comparator = Comparator;
-function Comparator(comp, loose) {
+_$semver_4.Comparator = Comparator;
+function Comparator(comp, options) {
+  if (!options || typeof options !== 'object')
+    options = { loose: !!options, includePrerelease: false }
+
   if (comp instanceof Comparator) {
-    if (comp.loose === loose)
+    if (comp.loose === !!options.loose)
       return comp;
     else
       comp = comp.value;
   }
 
   if (!(this instanceof Comparator))
-    return new Comparator(comp, loose);
+    return new Comparator(comp, options);
 
-  debug('comparator', comp, loose);
-  this.loose = loose;
+  debug('comparator', comp, options);
+  this.options = options;
+  this.loose = !!options.loose;
   this.parse(comp);
 
   if (this.semver === ANY)
@@ -11246,7 +11259,7 @@ function Comparator(comp, loose) {
 
 var ANY = {};
 Comparator.prototype.parse = function(comp) {
-  var r = this.loose ? re[COMPARATORLOOSE] : re[COMPARATOR];
+  var r = this.options.loose ? re[COMPARATORLOOSE] : re[COMPARATOR];
   var m = comp.match(r);
 
   if (!m)
@@ -11260,7 +11273,7 @@ Comparator.prototype.parse = function(comp) {
   if (!m[2])
     this.semver = ANY;
   else
-    this.semver = new SemVer(m[2], this.loose);
+    this.semver = new SemVer(m[2], this.options.loose);
 };
 
 Comparator.prototype.toString = function() {
@@ -11268,30 +11281,33 @@ Comparator.prototype.toString = function() {
 };
 
 Comparator.prototype.test = function(version) {
-  debug('Comparator.test', version, this.loose);
+  debug('Comparator.test', version, this.options.loose);
 
   if (this.semver === ANY)
     return true;
 
   if (typeof version === 'string')
-    version = new SemVer(version, this.loose);
+    version = new SemVer(version, this.options);
 
-  return cmp(version, this.operator, this.semver, this.loose);
+  return cmp(version, this.operator, this.semver, this.options);
 };
 
-Comparator.prototype.intersects = function(comp, loose) {
+Comparator.prototype.intersects = function(comp, options) {
   if (!(comp instanceof Comparator)) {
     throw new TypeError('a Comparator is required');
   }
 
+  if (!options || typeof options !== 'object')
+    options = { loose: !!options, includePrerelease: false }
+
   var rangeTmp;
 
   if (this.operator === '') {
-    rangeTmp = new Range(comp.value, loose);
-    return satisfies(this.value, rangeTmp, loose);
+    rangeTmp = new Range(comp.value, options);
+    return satisfies(this.value, rangeTmp, options);
   } else if (comp.operator === '') {
-    rangeTmp = new Range(this.value, loose);
-    return satisfies(comp.semver, rangeTmp, loose);
+    rangeTmp = new Range(this.value, options);
+    return satisfies(comp.semver, rangeTmp, options);
   }
 
   var sameDirectionIncreasing =
@@ -11305,11 +11321,11 @@ Comparator.prototype.intersects = function(comp, loose) {
     (this.operator === '>=' || this.operator === '<=') &&
     (comp.operator === '>=' || comp.operator === '<=');
   var oppositeDirectionsLessThan =
-    cmp(this.semver, '<', comp.semver, loose) &&
+    cmp(this.semver, '<', comp.semver, options) &&
     ((this.operator === '>=' || this.operator === '>') &&
     (comp.operator === '<=' || comp.operator === '<'));
   var oppositeDirectionsGreaterThan =
-    cmp(this.semver, '>', comp.semver, loose) &&
+    cmp(this.semver, '>', comp.semver, options) &&
     ((this.operator === '<=' || this.operator === '<') &&
     (comp.operator === '>=' || comp.operator === '>'));
 
@@ -11319,24 +11335,30 @@ Comparator.prototype.intersects = function(comp, loose) {
 };
 
 
-exports.Range = Range;
-function Range(range, loose) {
+_$semver_4.Range = Range;
+function Range(range, options) {
+  if (!options || typeof options !== 'object')
+    options = { loose: !!options, includePrerelease: false }
+
   if (range instanceof Range) {
-    if (range.loose === loose) {
+    if (range.loose === !!options.loose &&
+        range.includePrerelease === !!options.includePrerelease) {
       return range;
     } else {
-      return new Range(range.raw, loose);
+      return new Range(range.raw, options);
     }
   }
 
   if (range instanceof Comparator) {
-    return new Range(range.value, loose);
+    return new Range(range.value, options);
   }
 
   if (!(this instanceof Range))
-    return new Range(range, loose);
+    return new Range(range, options);
 
-  this.loose = loose;
+  this.options = options;
+  this.loose = !!options.loose;
+  this.includePrerelease = !!options.includePrerelease
 
   // First, split based on boolean or ||
   this.raw = range;
@@ -11366,9 +11388,8 @@ Range.prototype.toString = function() {
 };
 
 Range.prototype.parseRange = function(range) {
-  var loose = this.loose;
+  var loose = this.options.loose;
   range = range.trim();
-  debug('range', range, loose);
   // `1.2.3 - 1.2.4` => `>=1.2.3 <=1.2.4`
   var hr = loose ? re[HYPHENRANGELOOSE] : re[HYPHENRANGE];
   range = range.replace(hr, hyphenReplace);
@@ -11391,22 +11412,22 @@ Range.prototype.parseRange = function(range) {
 
   var compRe = loose ? re[COMPARATORLOOSE] : re[COMPARATOR];
   var set = range.split(' ').map(function(comp) {
-    return parseComparator(comp, loose);
-  }).join(' ').split(/\s+/);
-  if (this.loose) {
+    return parseComparator(comp, this.options);
+  }, this).join(' ').split(/\s+/);
+  if (this.options.loose) {
     // in loose mode, throw out any that are not valid comparators
     set = set.filter(function(comp) {
       return !!comp.match(compRe);
     });
   }
   set = set.map(function(comp) {
-    return new Comparator(comp, loose);
-  });
+    return new Comparator(comp, this.options);
+  }, this);
 
   return set;
 };
 
-Range.prototype.intersects = function(range, loose) {
+Range.prototype.intersects = function(range, options) {
   if (!(range instanceof Range)) {
     throw new TypeError('a Range is required');
   }
@@ -11415,7 +11436,7 @@ Range.prototype.intersects = function(range, loose) {
     return thisComparators.every(function(thisComparator) {
       return range.set.some(function(rangeComparators) {
         return rangeComparators.every(function(rangeComparator) {
-          return thisComparator.intersects(rangeComparator, loose);
+          return thisComparator.intersects(rangeComparator, options);
         });
       });
     });
@@ -11423,9 +11444,9 @@ Range.prototype.intersects = function(range, loose) {
 };
 
 // Mostly just for testing and legacy API reasons
-exports.toComparators = toComparators;
-function toComparators(range, loose) {
-  return new Range(range, loose).set.map(function(comp) {
+_$semver_4.toComparators = toComparators;
+function toComparators(range, options) {
+  return new Range(range, options).set.map(function(comp) {
     return comp.map(function(c) {
       return c.value;
     }).join(' ').trim().split(' ');
@@ -11435,15 +11456,15 @@ function toComparators(range, loose) {
 // comprised of xranges, tildes, stars, and gtlt's at this point.
 // already replaced the hyphen ranges
 // turn into a set of JUST comparators.
-function parseComparator(comp, loose) {
-  debug('comp', comp);
-  comp = replaceCarets(comp, loose);
+function parseComparator(comp, options) {
+  debug('comp', comp, options);
+  comp = replaceCarets(comp, options);
   debug('caret', comp);
-  comp = replaceTildes(comp, loose);
+  comp = replaceTildes(comp, options);
   debug('tildes', comp);
-  comp = replaceXRanges(comp, loose);
+  comp = replaceXRanges(comp, options);
   debug('xrange', comp);
-  comp = replaceStars(comp, loose);
+  comp = replaceStars(comp, options);
   debug('stars', comp);
   return comp;
 }
@@ -11458,14 +11479,16 @@ function isX(id) {
 // ~1.2, ~1.2.x, ~>1.2, ~>1.2.x --> >=1.2.0 <1.3.0
 // ~1.2.3, ~>1.2.3 --> >=1.2.3 <1.3.0
 // ~1.2.0, ~>1.2.0 --> >=1.2.0 <1.3.0
-function replaceTildes(comp, loose) {
+function replaceTildes(comp, options) {
   return comp.trim().split(/\s+/).map(function(comp) {
-    return replaceTilde(comp, loose);
+    return replaceTilde(comp, options);
   }).join(' ');
 }
 
-function replaceTilde(comp, loose) {
-  var r = loose ? re[TILDELOOSE] : re[TILDE];
+function replaceTilde(comp, options) {
+  if (!options || typeof options !== 'object')
+    options = { loose: !!options, includePrerelease: false }
+  var r = options.loose ? re[TILDELOOSE] : re[TILDE];
   return comp.replace(r, function(_, M, m, p, pr) {
     debug('tilde', comp, _, M, m, p, pr);
     var ret;
@@ -11499,15 +11522,17 @@ function replaceTilde(comp, loose) {
 // ^1.2, ^1.2.x --> >=1.2.0 <2.0.0
 // ^1.2.3 --> >=1.2.3 <2.0.0
 // ^1.2.0 --> >=1.2.0 <2.0.0
-function replaceCarets(comp, loose) {
+function replaceCarets(comp, options) {
   return comp.trim().split(/\s+/).map(function(comp) {
-    return replaceCaret(comp, loose);
+    return replaceCaret(comp, options);
   }).join(' ');
 }
 
-function replaceCaret(comp, loose) {
-  debug('caret', comp, loose);
-  var r = loose ? re[CARETLOOSE] : re[CARET];
+function replaceCaret(comp, options) {
+  debug('caret', comp, options);
+  if (!options || typeof options !== 'object')
+    options = { loose: !!options, includePrerelease: false }
+  var r = options.loose ? re[CARETLOOSE] : re[CARET];
   return comp.replace(r, function(_, M, m, p, pr) {
     debug('caret', comp, _, M, m, p, pr);
     var ret;
@@ -11554,16 +11579,18 @@ function replaceCaret(comp, loose) {
   });
 }
 
-function replaceXRanges(comp, loose) {
-  debug('replaceXRanges', comp, loose);
+function replaceXRanges(comp, options) {
+  debug('replaceXRanges', comp, options);
   return comp.split(/\s+/).map(function(comp) {
-    return replaceXRange(comp, loose);
+    return replaceXRange(comp, options);
   }).join(' ');
 }
 
-function replaceXRange(comp, loose) {
+function replaceXRange(comp, options) {
   comp = comp.trim();
-  var r = loose ? re[XRANGELOOSE] : re[XRANGE];
+  if (!options || typeof options !== 'object')
+    options = { loose: !!options, includePrerelease: false }
+  var r = options.loose ? re[XRANGELOOSE] : re[XRANGE];
   return comp.replace(r, function(ret, gtlt, M, m, p, pr) {
     debug('xRange', comp, ret, gtlt, M, m, p, pr);
     var xM = isX(M);
@@ -11627,8 +11654,8 @@ function replaceXRange(comp, loose) {
 
 // Because * is AND-ed with everything else in the comparator,
 // and '' means "any version", just remove the *s entirely.
-function replaceStars(comp, loose) {
-  debug('replaceStars', comp, loose);
+function replaceStars(comp, options) {
+  debug('replaceStars', comp, options);
   // Looseness is ignored here.  star is always as loose as it gets!
   return comp.trim().replace(re[STAR], '');
 }
@@ -11672,22 +11699,25 @@ Range.prototype.test = function(version) {
     return false;
 
   if (typeof version === 'string')
-    version = new SemVer(version, this.loose);
+    version = new SemVer(version, this.options);
 
   for (var i = 0; i < this.set.length; i++) {
-    if (testSet(this.set[i], version))
+    if (testSet(this.set[i], version, this.options))
       return true;
   }
   return false;
 };
 
-function testSet(set, version) {
+function testSet(set, version, options) {
   for (var i = 0; i < set.length; i++) {
     if (!set[i].test(version))
       return false;
   }
 
-  if (version.prerelease.length) {
+  if (!options)
+    options = {}
+
+  if (version.prerelease.length && !options.includePrerelease) {
     // Find the set of versions that are allowed to have prereleases
     // For example, ^1.2.3-pr.1 desugars to >=1.2.3-pr.1 <2.0.0
     // That should allow `1.2.3-pr.2` to pass.
@@ -11714,83 +11744,83 @@ function testSet(set, version) {
   return true;
 }
 
-exports.satisfies = satisfies;
-function satisfies(version, range, loose) {
+_$semver_4.satisfies = satisfies;
+function satisfies(version, range, options) {
   try {
-    range = new Range(range, loose);
+    range = new Range(range, options);
   } catch (er) {
     return false;
   }
   return range.test(version);
 }
 
-exports.maxSatisfying = maxSatisfying;
-function maxSatisfying(versions, range, loose) {
+_$semver_4.maxSatisfying = maxSatisfying;
+function maxSatisfying(versions, range, options) {
   var max = null;
   var maxSV = null;
   try {
-    var rangeObj = new Range(range, loose);
+    var rangeObj = new Range(range, options);
   } catch (er) {
     return null;
   }
   versions.forEach(function (v) {
-    if (rangeObj.test(v)) { // satisfies(v, range, loose)
+    if (rangeObj.test(v)) { // satisfies(v, range, options)
       if (!max || maxSV.compare(v) === -1) { // compare(max, v, true)
         max = v;
-        maxSV = new SemVer(max, loose);
+        maxSV = new SemVer(max, options);
       }
     }
   })
   return max;
 }
 
-exports.minSatisfying = minSatisfying;
-function minSatisfying(versions, range, loose) {
+_$semver_4.minSatisfying = minSatisfying;
+function minSatisfying(versions, range, options) {
   var min = null;
   var minSV = null;
   try {
-    var rangeObj = new Range(range, loose);
+    var rangeObj = new Range(range, options);
   } catch (er) {
     return null;
   }
   versions.forEach(function (v) {
-    if (rangeObj.test(v)) { // satisfies(v, range, loose)
+    if (rangeObj.test(v)) { // satisfies(v, range, options)
       if (!min || minSV.compare(v) === 1) { // compare(min, v, true)
         min = v;
-        minSV = new SemVer(min, loose);
+        minSV = new SemVer(min, options);
       }
     }
   })
   return min;
 }
 
-exports.validRange = validRange;
-function validRange(range, loose) {
+_$semver_4.validRange = validRange;
+function validRange(range, options) {
   try {
     // Return '*' instead of '' so that truthiness works.
     // This will throw if it's invalid anyway
-    return new Range(range, loose).range || '*';
+    return new Range(range, options).range || '*';
   } catch (er) {
     return null;
   }
 }
 
 // Determine if version is less than all the versions possible in the range
-exports.ltr = ltr;
-function ltr(version, range, loose) {
-  return outside(version, range, '<', loose);
+_$semver_4.ltr = ltr;
+function ltr(version, range, options) {
+  return outside(version, range, '<', options);
 }
 
 // Determine if version is greater than all the versions possible in the range.
-exports.gtr = gtr;
-function gtr(version, range, loose) {
-  return outside(version, range, '>', loose);
+_$semver_4.gtr = gtr;
+function gtr(version, range, options) {
+  return outside(version, range, '>', options);
 }
 
-exports.outside = outside;
-function outside(version, range, hilo, loose) {
-  version = new SemVer(version, loose);
-  range = new Range(range, loose);
+_$semver_4.outside = outside;
+function outside(version, range, hilo, options) {
+  version = new SemVer(version, options);
+  range = new Range(range, options);
 
   var gtfn, ltefn, ltfn, comp, ecomp;
   switch (hilo) {
@@ -11813,7 +11843,7 @@ function outside(version, range, hilo, loose) {
   }
 
   // If it satisifes the range it is not outside
-  if (satisfies(version, range, loose)) {
+  if (satisfies(version, range, options)) {
     return false;
   }
 
@@ -11832,9 +11862,9 @@ function outside(version, range, hilo, loose) {
       }
       high = high || comparator;
       low = low || comparator;
-      if (gtfn(comparator.semver, high.semver, loose)) {
+      if (gtfn(comparator.semver, high.semver, options)) {
         high = comparator;
-      } else if (ltfn(comparator.semver, low.semver, loose)) {
+      } else if (ltfn(comparator.semver, low.semver, options)) {
         low = comparator;
       }
     });
@@ -11857,20 +11887,20 @@ function outside(version, range, hilo, loose) {
   return true;
 }
 
-exports.prerelease = prerelease;
-function prerelease(version, loose) {
-  var parsed = parse(version, loose);
+_$semver_4.prerelease = prerelease;
+function prerelease(version, options) {
+  var parsed = parse(version, options);
   return (parsed && parsed.prerelease.length) ? parsed.prerelease : null;
 }
 
-exports.intersects = intersects;
-function intersects(r1, r2, loose) {
-  r1 = new Range(r1, loose)
-  r2 = new Range(r2, loose)
+_$semver_4.intersects = intersects;
+function intersects(r1, r2, options) {
+  r1 = new Range(r1, options)
+  r2 = new Range(r2, options)
   return r1.intersects(r2)
 }
 
-exports.coerce = coerce;
+_$semver_4.coerce = coerce;
 function coerce(version) {
   if (version instanceof SemVer)
     return version;
@@ -11886,14 +11916,13 @@ function coerce(version) {
   return parse((match[1] || '0') + '.' + (match[2] || '0') + '.' + (match[3] || '0')); 
 }
 
-}).call(this,require('_process'))
-},{"_process":3}],5:[function(require,module,exports){
+}).call(this,_$browser_3)
 /**
  * This file automatically generated from `pre-publish.js`.
  * Do not manually edit.
  */
 
-module.exports = {
+var _$voidElements_5 = {
   "area": true,
   "base": true,
   "br": true,
@@ -11910,7 +11939,47 @@ module.exports = {
   "wbr": true
 };
 
-},{}],6:[function(require,module,exports){
+var _$url_7 = {};
+/* eslint-env browser */
+
+/**
+ * Simple lightweight shim of Node.js's `url.parse()`
+ * ( https://nodejs.org/docs/latest/api/url.html )
+ * for use within browsers.
+ */
+(function () {
+    'use strict';
+
+    // Only properties common to both browsers and Node.js are supported.
+    // For what browsers support, see https://developer.mozilla.org/en-US/docs/Web/API/URLUtils
+    var URL_PROPERTIES = [
+        'hash',
+        'host',
+        'hostname',
+        'href',
+        'pathname',
+        'port',
+        'protocol',
+        'search'
+    ];
+
+    /**
+     * @param {string} urlStr URL to parse
+     * @returns {object} Object with fields representing the various parts of the parsed URL.
+     */
+    function parse(urlStr) {
+        var anchor = document.createElement('a');
+        anchor.href = urlStr;
+        var urlObj = {};
+        URL_PROPERTIES.forEach(function (property) {
+            urlObj[property] = anchor[property];
+        });
+        return urlObj;
+    }
+    _$url_7.parse = parse;
+})();
+
+var _$bootlint_6 = {};
 /*!
  * Bootlint - an HTML linter for Bootstrap projects
  * https://github.com/twbs/bootlint
@@ -11918,12 +11987,12 @@ module.exports = {
  * Licensed under the MIT License.
  */
 
-var cheerio = require('cheerio');
-var parseUrl = require('url').parse;
-var semver = require('semver');
-var voidElements = require('void-elements');
-var _location = require('./location');
-var LocationIndex = _location.LocationIndex;
+/* removed: var _$jquery_2 = require('cheerio'); */;
+var parseUrl = _$url_7.parse;
+/* removed: var _$semver_4 = require('semver'); */;
+/* removed: var _$voidElements_5 = require('void-elements'); */;
+/* removed: var _$empty_1 = require('./location'); */;
+var LocationIndex = _$empty_1.LocationIndex;
 
 (function (exports) {
     'use strict';
@@ -11944,7 +12013,7 @@ var LocationIndex = _location.LocationIndex;
         lg: 3
     };
     var NUM2SCREEN = ['xs', 'sm', 'md', 'lg'];
-    var IN_NODE_JS = Boolean(cheerio.load);
+    var IN_NODE_JS = Boolean(_$jquery_2.load);
     var MIN_JQUERY_VERSION = '1.9.1';   // as of Bootstrap v3.3.0
     var CURRENT_BOOTSTRAP_VERSION = '3.3.7';
     var BOOTSTRAP_VERSION_4 = '4.0.0';
@@ -12151,7 +12220,7 @@ var LocationIndex = _location.LocationIndex;
             return constructor.VERSION;
         }).filter(function (version) {
             return typeof version !== 'undefined';
-        }).sort(semver.compare);
+        }).sort(_$semver_4.compare);
     }
 
     function bootstrapScriptsIn($) {
@@ -12182,7 +12251,7 @@ var LocationIndex = _location.LocationIndex;
         this.id = id;
         this.url = WIKI_URL + id;
         this.message = message;
-        this.elements = elements || cheerio('');
+        this.elements = elements || _$jquery_2('');
     }
     exports.LintError = LintError;
 
@@ -12196,7 +12265,7 @@ var LocationIndex = _location.LocationIndex;
         this.id = id;
         this.url = WIKI_URL + id;
         this.message = message;
-        this.elements = elements || cheerio('');
+        this.elements = elements || _$jquery_2('');
     }
     exports.LintWarning = LintWarning;
 
@@ -12303,7 +12372,7 @@ var LocationIndex = _location.LocationIndex;
 
                     var upToDate = null;
                     try {
-                        upToDate = semver.gte(globalVersion, MIN_JQUERY_VERSION, true);
+                        upToDate = _$semver_4.gte(globalVersion, MIN_JQUERY_VERSION, true);
                     } catch (e) {
                         // invalid version number
                         // empty
@@ -12339,7 +12408,7 @@ var LocationIndex = _location.LocationIndex;
                 return;
             }
             var version = versions[versions.length - 1];
-            if (!semver.gte(version, MIN_JQUERY_VERSION, true)) {
+            if (!_$semver_4.gte(version, MIN_JQUERY_VERSION, true)) {
                 reporter(OLD_JQUERY, script);
             }
         });
@@ -12380,7 +12449,7 @@ var LocationIndex = _location.LocationIndex;
         var columns = $(selector);
         columns.each(function (_index, col) {
             var column = $(col);
-            var isVoidElement = voidElements[col.tagName.toLowerCase()];
+            var isVoidElement = _$voidElements_5[col.tagName.toLowerCase()];
             // can't just use :empty because :empty excludes nodes with all-whitespace text content
             var hasText = Boolean(column.text().trim().length);
             var hasChildren = Boolean(column.children(':first-child').length);
@@ -12429,7 +12498,7 @@ var LocationIndex = _location.LocationIndex;
             var versions = jqueryPluginVersions(globaljQuery);
             if (versions.length) {
                 var minVersion = versions[0];
-                if (semver.lt(minVersion, CURRENT_BOOTSTRAP_VERSION, true)) {
+                if (_$semver_4.lt(minVersion, CURRENT_BOOTSTRAP_VERSION, true)) {
                     reporter(OUTDATED_BOOTSTRAP + minVersion);
                     return;
                 }
@@ -12442,7 +12511,7 @@ var LocationIndex = _location.LocationIndex;
             if (version === null) {
                 return;
             }
-            if (semver.lt(version, CURRENT_BOOTSTRAP_VERSION, true)) {
+            if (_$semver_4.lt(version, CURRENT_BOOTSTRAP_VERSION, true)) {
                 reporter(OUTDATED_BOOTSTRAP + version, $(this));
             }
         });
@@ -12469,7 +12538,7 @@ var LocationIndex = _location.LocationIndex;
             var versions = jqueryPluginVersions(globaljQuery);
             if (versions.length) {
                 var minVersion = versions[0];
-                if (semver.gte(minVersion, BOOTSTRAP_VERSION_4, true)) {
+                if (_$semver_4.gte(minVersion, BOOTSTRAP_VERSION_4, true)) {
                     reporter(FUTURE_VERSION_ERROR);
                     return;
                 }
@@ -12482,7 +12551,7 @@ var LocationIndex = _location.LocationIndex;
             if (version === null) {
                 return;
             }
-            if (semver.gte(version, BOOTSTRAP_VERSION_4, true)) {
+            if (_$semver_4.gte(version, BOOTSTRAP_VERSION_4, true)) {
                 reporter(FUTURE_VERSION_ERROR, $(this));
             }
         });
@@ -13092,14 +13161,14 @@ var LocationIndex = _location.LocationIndex;
          * @returns {undefined} Nothing
          */
         exports.lintHtml = function (html, reporter, disabledIds) {
-            var $ = cheerio.load(html, {withStartIndices: true});
+            var $ = _$jquery_2.load(html, {withStartIndices: true});
             this._lint($, reporter, disabledIds, html);
         };
     } else {
         // jQuery; in-browser
         /* @covignore */
         (function () {
-            var $ = cheerio;
+            var $ = _$jquery_2;
             /**
              * Lints the HTML of the current document.
              * @param {reporter} reporter Function to call with each lint problem
@@ -13159,46 +13228,6 @@ var LocationIndex = _location.LocationIndex;
             /* eslint-enable no-undef, block-scoped-var */
         })();
     }
-})(typeof exports === 'object' && exports || this);
+})(typeof _$bootlint_6 === 'object' && _$bootlint_6 || this);
 
-},{"./location":1,"cheerio":2,"semver":4,"url":7,"void-elements":5}],7:[function(require,module,exports){
-/* eslint-env browser */
-
-/**
- * Simple lightweight shim of Node.js's `url.parse()`
- * ( https://nodejs.org/docs/latest/api/url.html )
- * for use within browsers.
- */
-(function () {
-    'use strict';
-
-    // Only properties common to both browsers and Node.js are supported.
-    // For what browsers support, see https://developer.mozilla.org/en-US/docs/Web/API/URLUtils
-    var URL_PROPERTIES = [
-        'hash',
-        'host',
-        'hostname',
-        'href',
-        'pathname',
-        'port',
-        'protocol',
-        'search'
-    ];
-
-    /**
-     * @param {string} urlStr URL to parse
-     * @returns {object} Object with fields representing the various parts of the parsed URL.
-     */
-    function parse(urlStr) {
-        var anchor = document.createElement('a');
-        anchor.href = urlStr;
-        var urlObj = {};
-        URL_PROPERTIES.forEach(function (property) {
-            urlObj[property] = anchor[property];
-        });
-        return urlObj;
-    }
-    exports.parse = parse;
-})();
-
-},{}]},{},[6]);
+}());
